@@ -93,7 +93,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     """Format Pydantic validation errors cleanly."""
     logger.warning(f"Input validation error at {request.url.path}: {exc.errors()}")
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={
             "status": "error",
             "error_type": "ValidationError",
