@@ -6,7 +6,7 @@ Standardizes the structure of ML detection responses returned to API clients,
 including intrusion status flags, confidence levels, class probabilities, and linked event IDs.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional, List
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -27,7 +27,7 @@ class DetectionResult(BaseModel):
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score of predicted class")
     probabilities: Dict[str, float] = Field(default_factory=dict, description="Class-wise probability distribution")
     inference_time_ms: float = Field(..., description="Execution latency in milliseconds")
-    timestamp: datetime = Field(default_factory=datetime.utcnow, description="UTC timestamp of inspection")
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="UTC timestamp of inspection")
 
 
 class BatchDetectionResponse(BaseModel):

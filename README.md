@@ -213,46 +213,64 @@ python ml/scripts/predict_sample.py
 
 ---
 
-## 6. How Phase 2 Will Import the Model (FastAPI Integration Preview)
+## 6. Phase 2: FastAPI Backend Service & PostgreSQL Integration
 
-The `SentinelXPredictor` class is completely decoupled from CLI scripts and training code, making it trivial to integrate with a FastAPI router in Phase 2:
+SENTINELX Phase 2 introduces a production-style, asynchronous REST API service built with FastAPI, SQLAlchemy ORM, and Pydantic validation.
 
-```python
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from ml.src.inference.predictor import SentinelXPredictor
+### Backend Directory Structure
+```
+backend/
+├── app/
+│   ├── main.py                   # FastAPI entry point, lifespan, CORS & exception handlers
+│   ├── config.py                 # Pydantic BaseSettings for environment variables
+│   ├── api/
+│   │   ├── dependencies.py       # Dependency injection (get_db, services)
+│   │   └── routes/
+│   │       ├── health.py         # GET /api/v1/health (DB & ML readiness)
+│   │       ├── detection.py      # POST /api/v1/detect, /batch, GET /events
+│   │       ├── alerts.py         # GET, POST, PATCH /api/v1/alerts
+│   │       ├── incidents.py      # GET, POST, PATCH /api/v1/incidents
+│   │       └── statistics.py     # GET /api/v1/stats/overview
+│   ├── database/
+│   │   ├── session.py            # SQLAlchemy engine, SessionLocal, get_db
+│   │   └── init_db.py            # Table creation & ping checks
+│   ├── models/                   # SQLAlchemy ORM Models
+│   │   ├── network_event.py      # Raw flow telemetry & IP/port forensics
+│   │   ├── prediction_log.py     # ML inference audit logs
+│   │   ├── alert.py              # Security alerts with severity & status
+│   │   └── incident.py           # Correlated security incident cases
+│   ├── schemas/                  # Pydantic Request & Response Schemas
+│   ├── services/                 # Business logic & ML coordination layer
+│   ├── ml/
+│   │   └── model_loader.py       # Singleton ML model manager
+│   └── utils/
+│       └── logger.py             # Structured logging
+├── tests/                        # Comprehensive Pytest suite (15 tests)
+├── requirements.txt              # Backend dependencies
+└── .env.example                  # Environment configuration template
+```
 
-app = FastAPI(title="SENTINELX Security Analytics API", version="1.0.0")
+### Running the Backend Server
 
-# Initialize model predictor once during application startup
-predictor = SentinelXPredictor(model_dir="ml/models")
+```powershell
+# In PowerShell from c:\SENTINELX:
+.venv\Scripts\Activate.ps1
 
-class NetworkFlowPayload(BaseModel):
-    duration: float
-    protocol_type: str
-    service: str
-    flag: str
-    src_bytes: int
-    dst_bytes: int
-    count: int
-    srv_count: int
-    same_srv_rate: float
-    diff_srv_rate: float
-    dst_host_count: int
-    dst_host_srv_count: int
-    dst_host_same_srv_rate: float
-    dst_host_diff_srv_rate: float
+# Install backend dependencies
+pip install -r backend/requirements.txt
 
-@app.post("/api/v1/inspect-flow")
-def inspect_flow(flow: NetworkFlowPayload):
-    try:
-        result = predictor.predict_single(flow.dict())
-        return {
-            "status": "success",
-            "detection": result
-        }
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+# Start the FastAPI server with Uvicorn
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+- **Interactive Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc Specification**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Health Check**: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
+
+### Running the Backend Test Suite
+
+```powershell
+pytest backend/tests -v
 ```
 
 ---
