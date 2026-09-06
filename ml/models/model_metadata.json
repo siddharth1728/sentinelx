@@ -1,0 +1,76 @@
+{
+  "model_type": "RandomForestClassifier",
+  "hyperparameters": {
+    "n_estimators": 100,
+    "max_depth": 15,
+    "min_samples_split": 5,
+    "min_samples_leaf": 2,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "trained_at_utc": "2026-09-06T06:40:45.449880+00:00",
+  "train_samples": 4000,
+  "feature_count": 29,
+  "classes": [
+    "0",
+    "1"
+  ],
+  "class_names": [
+    "Normal",
+    "Attack"
+  ],
+  "is_production_ready": false,
+  "disclaimer": "SENTINELX Phase 1 development baseline model. Not validated for production deployment.",
+  "feature_pipeline_metadata": {
+    "numerical_cols": [
+      "duration",
+      "src_bytes",
+      "dst_bytes",
+      "count",
+      "srv_count",
+      "same_srv_rate",
+      "diff_srv_rate",
+      "dst_host_count",
+      "dst_host_srv_count",
+      "dst_host_same_srv_rate",
+      "dst_host_diff_srv_rate"
+    ],
+    "categorical_cols": [
+      "protocol_type",
+      "service",
+      "flag"
+    ],
+    "num_transformed_features": 29,
+    "transformed_feature_names": [
+      "num__duration",
+      "num__src_bytes",
+      "num__dst_bytes",
+      "num__count",
+      "num__srv_count",
+      "num__same_srv_rate",
+      "num__diff_srv_rate",
+      "num__dst_host_count",
+      "num__dst_host_srv_count",
+      "num__dst_host_same_srv_rate",
+      "num__dst_host_diff_srv_rate",
+      "cat__protocol_type_icmp",
+      "cat__protocol_type_tcp",
+      "cat__protocol_type_udp",
+      "cat__service_dns",
+      "cat__service_eco_i",
+      "cat__service_ftp",
+      "cat__service_http",
+      "cat__service_https",
+      "cat__service_other",
+      "cat__service_private",
+      "cat__service_smtp",
+      "cat__service_ssh",
+      "cat__service_telnet",
+      "cat__flag_REJ",
+      "cat__flag_RSTOS0",
+      "cat__flag_RSTR",
+      "cat__flag_S0",
+      "cat__flag_SF"
+    ]
+  }
+}
